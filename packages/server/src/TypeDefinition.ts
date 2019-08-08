@@ -1,11 +1,13 @@
 import Dataloader from 'dataloader';
 
 import { IUser } from './modules/user/UserModel';
+import { ITweet } from './modules/tweet/TweetModel';
 
 type Key = string;
 
 export type Dataloaders = {
   UserLoader: Dataloader<Key, IUser>;
+  TweetLoader: Dataloader<Key, ITweet>;
 };
 
 export type GraphQLContext = {

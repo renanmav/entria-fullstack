@@ -1,11 +1,10 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID } from 'graphql';
 import { connectionArgs, fromGlobalId } from 'graphql-relay';
 
 import UserType, { UserConnection } from '../modules/user/UserType';
 import { nodeField } from '../interface/NodeInterface';
-import { UserLoader } from '../loader';
-import TweetType from '../modules/tweet/TweetType';
-import TweetModel from '../modules/tweet/TweetModel';
+import { UserLoader, TweetLoader } from '../loader';
+import { TweetConnection } from '../modules/tweet/TweetType';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -39,8 +38,9 @@ export default new GraphQLObjectType({
       resolve: (obj, args, context) => UserLoader.loadUsers(context, args),
     },
     tweets: {
-      type: GraphQLList(TweetType),
-      resolve: () => TweetModel.find(),
+      type: TweetConnection.connectionType,
+      args: connectionArgs,
+      resolve: (obj, args, context) => TweetLoader.loadTweets(context, args),
     },
   }),
 });

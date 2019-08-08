@@ -1,8 +1,9 @@
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt } from 'graphql';
+import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLNonNull } from 'graphql';
 
 import { globalIdField } from 'graphql-relay';
 import { registerType, nodeInterface } from '../../interface/NodeInterface';
 import { ITweet } from './TweetModel';
+import { connectionDefinitions } from '../../core/connection/CustomConnectionType';
 
 const TweetType = registerType(
   new GraphQLObjectType<ITweet>({
@@ -32,3 +33,10 @@ const TweetType = registerType(
 );
 
 export default TweetType;
+
+export const TweetConnection = connectionDefinitions({
+  name: 'Tweet',
+  // TODO: Implement types in graphql-relay
+  // @ts-ignore
+  nodeType: GraphQLNonNull(TweetType),
+});
