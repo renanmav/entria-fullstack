@@ -4,6 +4,7 @@ import { globalIdField } from 'graphql-relay';
 import { registerType, nodeInterface } from '../../interface/NodeInterface';
 import { ITweet } from './TweetModel';
 import { connectionDefinitions } from '../../core/connection/CustomConnectionType';
+import UserType from '../user/UserType';
 
 const TweetType = registerType(
   new GraphQLObjectType<ITweet>({
@@ -26,6 +27,13 @@ const TweetType = registerType(
       retweets: {
         type: GraphQLInt,
         resolve: tweet => tweet.retweets,
+      },
+      author: {
+        type: UserType,
+        resolve: (tweet) => {
+          console.log(tweet);
+          return tweet.author;
+        },
       },
     }),
     interfaces: () => [nodeInterface],
