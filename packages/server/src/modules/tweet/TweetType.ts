@@ -5,6 +5,8 @@ import { registerType, nodeInterface } from '../../interface/NodeInterface';
 import { ITweet } from './TweetModel';
 import { connectionDefinitions } from '../../core/connection/CustomConnectionType';
 import UserType from '../user/UserType';
+import { TweetLoader } from '../../loader';
+import { GraphQLContext } from '../../TypeDefinition';
 
 const TweetType = registerType(
   new GraphQLObjectType<ITweet>({
@@ -30,10 +32,7 @@ const TweetType = registerType(
       },
       author: {
         type: UserType,
-        resolve: (tweet) => {
-          console.log(tweet);
-          return tweet.author;
-        },
+        resolve: (tweet, _args, context: GraphQLContext) => TweetLoader.getAuthor(tweet, context),
       },
     }),
     interfaces: () => [nodeInterface],

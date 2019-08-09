@@ -6,6 +6,7 @@ import { ConnectionArguments } from 'graphql-relay';
 
 import TweetModel, { ITweet } from './TweetModel';
 import { GraphQLContext } from '../../TypeDefinition';
+import UserModel, { IUser } from '../user/UserModel';
 
 export default class Tweet {
   id: string;
@@ -18,13 +19,15 @@ export default class Tweet {
 
   retweets: number;
 
-  // eslint-disable-next-line
-  constructor(data: ITweet, _ctx: GraphQLContext) {
+  author: IUser;
+
+  constructor(data: ITweet) {
     this.id = data.id;
     this._id = data._id;
     this.content = data.content;
     this.likes = data.likes;
     this.retweets = data.retweets;
+    this.author = data.author;
   }
 }
 
@@ -44,7 +47,7 @@ export const load = async (context: GraphQLContext, id: any): Promise<Tweet | nu
   } catch (err) {
     return null;
   }
-  return viewerCanSee() ? new Tweet(data, context) : null;
+  return viewerCanSee() ? new Tweet(data) : null;
 };
 
 export const clearCache = ({ dataloaders }: GraphQLContext, id: Types.ObjectId) => dataloaders.TweetLoader.clear(id.toString());
@@ -60,4 +63,15 @@ export const loadTweets = async (context: GraphQLContext, args: ConnectionArgume
     args,
     loader: load,
   });
+};
+
+export const getAuthor = async ({ author: id }: ITweet, { user }: GraphQLContext) => {
+  const author = await UserModel.findById(id);
+
+  if (author && (!user || user._id.toString() !== id.toString())) {
+    author.email = undefined;
+    author.active = undefined;
+  }
+
+  return author;
 };

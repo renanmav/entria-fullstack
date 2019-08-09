@@ -33,8 +33,8 @@ const schema = new mongoose.Schema(
 export interface IUser extends Document {
   name: string;
   password?: string;
-  email: string;
-  active: boolean;
+  email?: string;
+  active?: boolean;
   authenticate: (plainTextPassword: string) => boolean;
   encryptPassword: (password: string | undefined) => string;
 }
