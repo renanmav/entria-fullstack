@@ -4,7 +4,7 @@ import { connectionArgs, fromGlobalId } from 'graphql-relay';
 import UserType, { UserConnection } from '../modules/user/UserType';
 import { nodeField } from '../interface/NodeInterface';
 import { UserLoader, TweetLoader } from '../loader';
-import { TweetConnection } from '../modules/tweet/TweetType';
+import TweetType, { TweetConnection } from '../modules/tweet/TweetType';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -36,6 +36,16 @@ export default new GraphQLObjectType({
         },
       },
       resolve: (obj, args, context) => UserLoader.loadUsers(context, args),
+    },
+    tweet: {
+      type: TweetType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: (obj, args, context) => {
+        const { id } = fromGlobalId(args.id);
+        return TweetLoader.load(context, id);
+      },
     },
     tweets: {
       type: TweetConnection.connectionType,
