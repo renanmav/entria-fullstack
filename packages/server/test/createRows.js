@@ -1,13 +1,16 @@
 // @flow
 /* eslint-disable no-multi-assign,prefer-const */
 
-import { User } from '../src/model';
+import { User, Tweet } from '../src/model';
 
 export const restartCounters = () => {
-  global.__COUNTERS__ = Object.keys(global.__COUNTERS__).reduce((prev, curr) => ({ ...prev, [curr]: 0 }), {});
+  global.__COUNTERS__ = Object.keys(global.__COUNTERS__).reduce(
+    (prev, curr) => ({ ...prev, [curr]: 0 }),
+    {},
+  );
 };
 
-export const createUser = async (payload: Object = {}) => {
+export const createUser = async (payload = {}) => {
   const n = (global.__COUNTERS__.user += 1);
 
   return new User({
@@ -15,6 +18,18 @@ export const createUser = async (payload: Object = {}) => {
     email: `user-${n}@example.com`,
     password: '123456',
     active: true,
+    ...payload,
+  }).save();
+};
+
+export const createTweet = async (payload = {}) => {
+  const n = (global.__COUNTERS__.user += 1);
+
+  const user = await createUser();
+
+  return new Tweet({
+    content: `Sample tweet ${n}`,
+    author: user._id,
     ...payload,
   }).save();
 };
