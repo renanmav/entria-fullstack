@@ -1,5 +1,4 @@
 import mongoose, { Document, Model } from 'mongoose';
-import { IUser } from '../user/UserModel';
 
 const schema = new mongoose.Schema(
   {
@@ -33,7 +32,7 @@ export interface ITweet extends Document {
   content: string;
   likes: number;
   retweets: number;
-  author: IUser;
+  author: string;
 }
 
 const TweetModel: Model<ITweet> = mongoose.model('Tweet', schema);

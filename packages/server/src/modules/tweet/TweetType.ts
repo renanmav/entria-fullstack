@@ -5,7 +5,7 @@ import { registerType, nodeInterface } from '../../interface/NodeInterface';
 import { ITweet } from './TweetModel';
 import { connectionDefinitions } from '../../core/connection/CustomConnectionType';
 import UserType from '../user/UserType';
-import { TweetLoader } from '../../loader';
+import { UserLoader } from '../../loader';
 import { GraphQLContext } from '../../TypeDefinition';
 
 const TweetType = registerType(
@@ -32,7 +32,7 @@ const TweetType = registerType(
       },
       author: {
         type: UserType,
-        resolve: (tweet, _args, context: GraphQLContext) => TweetLoader.getAuthor(tweet, context),
+        resolve: (tweet, _args, context: GraphQLContext) => UserLoader.getAuthor(tweet.author, context),
       },
     }),
     interfaces: () => [nodeInterface],

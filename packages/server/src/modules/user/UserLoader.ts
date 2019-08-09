@@ -1,13 +1,15 @@
+/* eslint-disable no-undef */
+/* eslint-disable import/no-unresolved */
 import DataLoader from 'dataloader';
 import { connectionFromMongoCursor, mongooseLoader } from '@entria/graphql-mongoose-loader';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { ConnectionArguments } from 'graphql-relay';
-import mongoose from 'mongoose';
-declare type ObjectId = mongoose.Schema.Types.ObjectId;
 
 import UserModel, { IUser } from './UserModel';
 
 import { GraphQLContext } from '../../TypeDefinition';
+
+declare type ObjectId = mongoose.Schema.Types.ObjectId;
 
 export default class User {
   id: string;
@@ -37,14 +39,18 @@ export const getLoader = () => new DataLoader((ids: ReadonlyArray<string>) => mo
 
 const viewerCanSee = () => true;
 
-export const load = async (context: GraphQLContext, id: string | Object | ObjectId): Promise<User | null> => {
+export const load = async (
+  context: GraphQLContext,
+  id: string | Object | ObjectId,
+): Promise<User | null> => {
   if (!id && typeof id !== 'string') {
     return null;
   }
 
   let data;
   try {
-    data = await context.dataloaders.UserLoader.load((id as string));
+    // @ts-ignore
+    data = await context.dataloaders.UserLoader.load(id);
   } catch (err) {
     return null;
   }
@@ -68,4 +74,15 @@ export const loadUsers = async (context: GraphQLContext, args: UserArgs) => {
     args,
     loader: load,
   });
+};
+
+export const getAuthor = async (id: string, { user }: GraphQLContext) => {
+  const author = await UserModel.findById(id);
+
+  if (author && (!user || user._id.toString() !== id.toString())) {
+    author.email = undefined;
+    author.active = undefined;
+  }
+
+  return author;
 };

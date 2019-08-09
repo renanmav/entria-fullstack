@@ -11,11 +11,12 @@ class MongoDbEnvironment extends NodeEnvironment {
         // settings here
         // dbName is null, so it's random
         // dbName: MONGO_DB_NAME,
+        port: 27017,
       },
       binary: {
         version: '4.0.0',
       },
-      // debug: true,
+      debug: true,
       autoStart: false,
     });
   }

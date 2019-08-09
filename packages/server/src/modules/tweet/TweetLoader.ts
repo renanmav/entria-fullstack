@@ -6,7 +6,6 @@ import { ConnectionArguments } from 'graphql-relay';
 
 import TweetModel, { ITweet } from './TweetModel';
 import { GraphQLContext } from '../../TypeDefinition';
-import UserModel, { IUser } from '../user/UserModel';
 
 export default class Tweet {
   id: string;
@@ -19,7 +18,7 @@ export default class Tweet {
 
   retweets: number;
 
-  author: IUser;
+  author: string;
 
   constructor(data: ITweet) {
     this.id = data.id;
@@ -27,15 +26,18 @@ export default class Tweet {
     this.content = data.content;
     this.likes = data.likes;
     this.retweets = data.retweets;
-    this.author = data.author;
+    this.author = data.author; // author === user._id
   }
 }
 
 // eslint-disable-next-line no-undef
 export const getLoader = () => new DataLoader((ids: ReadonlyArray<string>) => mongooseLoader(TweetModel, ids));
 
-const viewerCanSee = () => true;
+// users can see all tweets
+// As author is a UserType, so we'll use UserLoad viewerCanSee method
+const viewerCanSee = (_ctx: GraphQLContext, data: ITweet): Tweet | null => new Tweet(data);
 
+// eslint-disable-next-line
 export const load = async (context: GraphQLContext, id: any): Promise<Tweet | null> => {
   if (!id && typeof id !== 'string') {
     return null;
@@ -47,7 +49,7 @@ export const load = async (context: GraphQLContext, id: any): Promise<Tweet | nu
   } catch (err) {
     return null;
   }
-  return viewerCanSee() ? new Tweet(data) : null;
+  return viewerCanSee(context, data);
 };
 
 export const clearCache = ({ dataloaders }: GraphQLContext, id: Types.ObjectId) => dataloaders.TweetLoader.clear(id.toString());
@@ -68,15 +70,4 @@ export const loadTweets = async (context: GraphQLContext, args: TweetArgs) => {
     args,
     loader: load,
   });
-};
-
-export const getAuthor = async ({ author: id }: ITweet, { user }: GraphQLContext) => {
-  const author = await UserModel.findById(id);
-
-  if (author && (!user || user._id.toString() !== id.toString())) {
-    author.email = undefined;
-    author.active = undefined;
-  }
-
-  return author;
 };
