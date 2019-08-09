@@ -1,13 +1,19 @@
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLNonNull, GraphQLID, GraphQLBoolean, GraphQLString, GraphQLInt } from 'graphql';
 import { GraphQLContext } from '../../../TypeDefinition';
-import TweetModel, { ITweet } from '../TweetModel';
+import TweetModel from '../TweetModel';
 
 interface TweetUpdateInput {
   id: string;
   like: boolean;
   retweet: boolean;
   clientMudationId: string;
+}
+
+interface TweetUpdatePayload {
+  likes: number | null;
+  retweets: number | null;
+  error: string | null;
 }
 
 export default mutationWithClientMutationId({
@@ -50,20 +56,26 @@ export default mutationWithClientMutationId({
       tweet.retweets += 1;
     }
 
-    return tweet.save();
+    await tweet.save();
+    const { likes, retweets } = tweet;
+
+    return {
+      likes,
+      retweets,
+    };
   },
   outputFields: {
-    content: {
-      type: GraphQLString,
-      resolve: (tweet: ITweet) => tweet.content,
-    },
     likes: {
       type: GraphQLInt,
-      resolve: (tweet: ITweet) => tweet.likes,
+      resolve: ({ likes }: TweetUpdatePayload) => likes,
     },
     retweets: {
       type: GraphQLInt,
-      resolve: (tweet: ITweet) => tweet.retweets,
+      resolve: ({ retweets }: TweetUpdatePayload) => retweets,
+    },
+    error: {
+      type: GraphQLString,
+      resolve: ({ error }: TweetUpdatePayload) => error,
     },
   },
 });
