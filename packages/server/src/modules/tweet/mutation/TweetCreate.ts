@@ -9,6 +9,10 @@ interface TweetCreateInput {
   clientMutationId: string;
 }
 
+interface TweetCreatePayload extends ITweet {
+  error: string;
+}
+
 export default mutationWithClientMutationId({
   name: 'TweetCreate',
   description: 'Used to create a tweet',
@@ -30,26 +34,28 @@ export default mutationWithClientMutationId({
 
     tweet.author = user;
 
-    console.log(tweet);
-
     return tweet.save();
   },
   outputFields: {
     content: {
       type: GraphQLString,
-      resolve: (tweet: ITweet) => tweet.content,
+      resolve: ({ content }: TweetCreatePayload) => content,
     },
     likes: {
       type: GraphQLInt,
-      resolve: (tweet: ITweet) => tweet.likes,
+      resolve: ({ likes }: TweetCreatePayload) => likes,
     },
     retweets: {
       type: GraphQLInt,
-      resolve: (tweet: ITweet) => tweet.retweets,
+      resolve: ({ retweets }: TweetCreatePayload) => retweets,
     },
     author: {
       type: UserType,
-      resolve: (tweet: ITweet) => tweet.author,
+      resolve: ({ author }: TweetCreatePayload) => author,
+    },
+    error: {
+      type: GraphQLString,
+      resolve: ({ error }: TweetCreatePayload) => error,
     },
   },
 });

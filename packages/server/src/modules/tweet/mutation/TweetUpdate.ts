@@ -40,29 +40,25 @@ export default mutationWithClientMutationId({
       };
     }
 
-    const tweet = await TweetModel.findById(id);
+    try {
+      const tweet = await TweetModel.findById(id);
 
-    if (!tweet) {
+      // typescript doesn't recognizes that above line will throw an Exception (eslint conflicts type assertion)
+      if (!tweet) return { error: "This tweet doesn't exists" };
+
+      if (like) tweet.likes += 1;
+      if (retweet) tweet.retweets += 1;
+
+      await tweet.save();
+
+      const { likes, retweets } = tweet;
       return {
-        error: "This tweet doesn't exists",
+        likes,
+        retweets,
       };
+    } catch (err) {
+      return { error: "This tweet doesn't exists" };
     }
-
-    if (like) {
-      tweet.likes += 1;
-    }
-
-    if (retweet) {
-      tweet.retweets += 1;
-    }
-
-    await tweet.save();
-    const { likes, retweets } = tweet;
-
-    return {
-      likes,
-      retweets,
-    };
   },
   outputFields: {
     likes: {
