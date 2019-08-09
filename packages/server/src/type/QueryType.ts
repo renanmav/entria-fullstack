@@ -49,7 +49,12 @@ export default new GraphQLObjectType({
     },
     tweets: {
       type: TweetConnection.connectionType,
-      args: connectionArgs,
+      args: {
+        ...connectionArgs,
+        authorId: {
+          type: GraphQLID,
+        },
+      },
       resolve: (obj, args, context) => TweetLoader.loadTweets(context, args),
     },
   }),

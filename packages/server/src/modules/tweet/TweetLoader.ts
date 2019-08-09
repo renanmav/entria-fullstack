@@ -54,8 +54,13 @@ export const clearCache = ({ dataloaders }: GraphQLContext, id: Types.ObjectId) 
 export const primeCache = ({ dataloaders }: GraphQLContext, id: Types.ObjectId, data: ITweet) => dataloaders.TweetLoader.prime(id.toString(), data);
 export const clearAndPrimeCache = (context: GraphQLContext, id: Types.ObjectId, data: ITweet) => clearCache(context, id) && primeCache(context, id, data);
 
-export const loadTweets = async (context: GraphQLContext, args: ConnectionArguments) => {
-  const tweets = TweetModel.find().sort({ createdAt: -1 });
+type TweetArgs = ConnectionArguments & {
+  authorId?: string;
+};
+
+export const loadTweets = async (context: GraphQLContext, args: TweetArgs) => {
+  const where = args.authorId ? { author: args.authorId } : {};
+  const tweets = TweetModel.find(where).sort({ createdAt: -1 });
 
   return connectionFromMongoCursor({
     cursor: tweets,
