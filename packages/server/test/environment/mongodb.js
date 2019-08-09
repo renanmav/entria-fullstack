@@ -14,9 +14,9 @@ class MongoDbEnvironment extends NodeEnvironment {
         port: 27017,
       },
       binary: {
-        version: '4.0.0',
+        version: '4.0.12',
       },
-      debug: true,
+      //debug: true,
       autoStart: false,
     });
   }
