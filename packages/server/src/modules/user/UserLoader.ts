@@ -22,22 +22,32 @@ export default class User {
 
   active: boolean | null | undefined;
 
-  constructor(data: IUser, { user }: GraphQLContext) {
+  constructor(data: IUser) {
     this.id = data.id;
     this._id = data._id;
     this.name = data.name;
-
-    // you can only see your own email, and your active status
-    if (user && user._id.equals(data._id)) {
-      this.email = data.email;
-      this.active = data.active;
-    }
+    this.email = data.email;
+    this.active = data.active;
   }
 }
 
 export const getLoader = () => new DataLoader((ids: ReadonlyArray<string>) => mongooseLoader(UserModel, ids));
 
-const viewerCanSee = () => true;
+// you can only see your own email, and your active status
+const viewerCanSee = ({ user }: GraphQLContext, data: IUser | null): User | null => {
+  if (!data) {
+    return null;
+  }
+
+  if (user && user._id.equals(data._id)) {
+    return new User(data);
+  }
+
+  data.email = undefined;
+  data.active = undefined;
+
+  return new User(data);
+};
 
 export const load = async (
   context: GraphQLContext,
@@ -54,7 +64,7 @@ export const load = async (
   } catch (err) {
     return null;
   }
-  return viewerCanSee() ? new User(data, context) : null;
+  return viewerCanSee(context, data);
 };
 
 export const clearCache = ({ dataloaders }: GraphQLContext, id: Types.ObjectId) => dataloaders.UserLoader.clear(id.toString());
@@ -76,13 +86,8 @@ export const loadUsers = async (context: GraphQLContext, args: UserArgs) => {
   });
 };
 
-export const getAuthor = async (id: string, { user }: GraphQLContext) => {
+export const getAuthor = async (id: string, context: GraphQLContext) => {
   const author = await UserModel.findById(id);
 
-  if (author && (!user || user._id.toString() !== id.toString())) {
-    author.email = undefined;
-    author.active = undefined;
-  }
-
-  return author;
+  return viewerCanSee(context, author);
 };
