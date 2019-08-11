@@ -2,6 +2,7 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLNonNull, GraphQLID, GraphQLBoolean, GraphQLString, GraphQLInt } from 'graphql';
 import { GraphQLContext } from '../../../TypeDefinition';
 import TweetModel from '../TweetModel';
+import { EVENTS } from '../../../pubSub';
 
 interface TweetUpdateInput {
   id: string;
@@ -32,7 +33,7 @@ export default mutationWithClientMutationId({
   },
   mutateAndGetPayload: async (
     { id, like, retweet }: TweetUpdateInput,
-    { user }: GraphQLContext,
+    { user, pubsub }: GraphQLContext,
   ) => {
     if (!user) {
       return {
@@ -46,8 +47,14 @@ export default mutationWithClientMutationId({
       // typescript doesn't recognizes that above line will throw an Exception (eslint conflicts type assertion)
       if (!tweet) return { error: "This tweet doesn't exists" };
 
-      if (like) tweet.likes += 1;
-      if (retweet) tweet.retweets += 1;
+      if (like) {
+        tweet.likes += 1;
+        pubsub.publish(EVENTS.TWEET.LIKE, { LikeTweet: tweet });
+      }
+      if (retweet) {
+        tweet.retweets += 1;
+        pubsub.publish(EVENTS.TWEET.RETWEET, { RetweetTweet: tweet });
+      }
 
       await tweet.save();
 

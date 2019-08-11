@@ -1,4 +1,5 @@
 import Dataloader from 'dataloader';
+import { PubSub } from 'graphql-subscriptions';
 
 import { IUser } from './modules/user/UserModel';
 import { ITweet } from './modules/tweet/TweetModel';
@@ -13,4 +14,5 @@ export type Dataloaders = {
 export type GraphQLContext = {
   user?: IUser;
   dataloaders: Dataloaders;
+  pubsub: PubSub;
 };

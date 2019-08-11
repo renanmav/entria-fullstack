@@ -19,6 +19,7 @@ import { schema } from './schema';
 import { getUser } from './auth';
 import * as loaders from './loader';
 import { Loaders } from './interface/NodeInterface';
+import pubsub from './pubSub';
 
 const app = new Koa();
 const router = new Router();
@@ -47,6 +48,7 @@ const graphqlSettingsPerReq = async (req: Request) => {
       user,
       req,
       dataloaders,
+      pubsub,
     },
     // extensions: ({ document, variables, operationName, result }) => {
     // console.log(print(document));

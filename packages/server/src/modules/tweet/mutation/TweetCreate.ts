@@ -3,6 +3,7 @@ import { GraphQLNonNull, GraphQLString, GraphQLInt } from 'graphql';
 import TweetModel, { ITweet } from '../TweetModel';
 import { GraphQLContext } from '../../../TypeDefinition';
 import UserType from '../../user/UserType';
+import { EVENTS } from '../../../pubSub';
 
 interface TweetCreateInput {
   content: string;
@@ -21,7 +22,7 @@ export default mutationWithClientMutationId({
       type: new GraphQLNonNull(GraphQLString),
     },
   },
-  mutateAndGetPayload: async ({ content }: TweetCreateInput, { user }: GraphQLContext) => {
+  mutateAndGetPayload: async ({ content }: TweetCreateInput, { user, pubsub }: GraphQLContext) => {
     if (!user) {
       return {
         error: 'User not authenticated',
@@ -34,7 +35,11 @@ export default mutationWithClientMutationId({
 
     tweet.author = user;
 
-    return tweet.save();
+    await tweet.save();
+
+    pubsub.publish(EVENTS.TWEET.NEW, { NewTweet: tweet });
+
+    return tweet;
   },
   outputFields: {
     content: {

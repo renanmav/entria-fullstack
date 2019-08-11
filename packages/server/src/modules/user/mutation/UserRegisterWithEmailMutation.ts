@@ -1,11 +1,11 @@
-
 import { GraphQLString, GraphQLNonNull } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 
 import { generateToken } from '../../../auth';
-import pubSub, { EVENTS } from '../../../pubSub';
+import { EVENTS } from '../../../pubSub';
 
 import UserModel from '../UserModel';
+import { GraphQLContext } from '../../../TypeDefinition';
 
 export default mutationWithClientMutationId({
   name: 'UserRegisterWithEmail',
@@ -20,7 +20,7 @@ export default mutationWithClientMutationId({
       type: new GraphQLNonNull(GraphQLString),
     },
   },
-  mutateAndGetPayload: async ({ name, email, password }) => {
+  mutateAndGetPayload: async ({ name, email, password }, { pubsub }: GraphQLContext) => {
     let user = await UserModel.findOne({ email: email.toLowerCase() });
 
     if (user) {
@@ -37,7 +37,7 @@ export default mutationWithClientMutationId({
 
     await user.save();
 
-    await pubSub.publish(EVENTS.USER.ADDED, { UserAdded: { user } });
+    pubsub.publish(EVENTS.USER.ADDED, { UserAdded: { user } });
 
     return {
       token: generateToken(user),
