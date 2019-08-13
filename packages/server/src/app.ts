@@ -1,3 +1,4 @@
+
 import 'isomorphic-fetch';
 
 import Koa, { Request } from 'koa';
@@ -5,10 +6,9 @@ import bodyParser from 'koa-bodyparser';
 import cors from 'kcors';
 // TODO: contribute to the package creating a TS definition
 // there is a definition inside index.d.ts but not working
-// @ts-ignore
 import graphqlHttp from 'koa-graphql';
 // TODO: contribute to the package creating a TS definition
-// @ts-ignore
+// @ts-ignore 
 import graphqlBatchHttpWrapper from 'koa-graphql-batch';
 import logger from 'koa-logger';
 import Router from 'koa-router';
@@ -78,7 +78,7 @@ router.all(
   '/graphiql',
   koaPlayground({
     endpoint: '/graphql',
-    subscriptionEndpoint: '/subscriptions',
+    subscriptionEndpoint: `ws://localhost:${process.env.GRAPHQL_PORT}/subscriptions`,
   }),
 );
 
