@@ -1,19 +1,7 @@
-import path from 'path';
-import dotenvSafe from 'dotenv-safe';
-
-const root = path.join.bind(this, __dirname, '../');
-
-if (process.env.NOW_REGION) {
-  dotenvSafe.load({
-    path: root('.env'),
-    sample: root('.env.example'),
-  });
-}
-
 const ENV = process.env;
 
 // Database Settings
-const dBdevelopment = ENV.MONGO_URL || 'mongodb://localhost:27017/graphql';
+const dBdevelopment = ENV.MONGO_URL || 'mongodb://admin:entria12345678@ds163757.mlab.com:63757/twitter-relay';
 const dBproduction = ENV.MONGO_URL || 'mongodb://admin:entria12345678@ds163757.mlab.com:63757/twitter-relay';
 
 // Test Database Settings
