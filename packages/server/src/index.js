@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 /* eslint implicit-arrow-linebreak: 0 */
 
 import '@babel/polyfill';
@@ -28,8 +29,7 @@ logger.add(getConsoleTransport('graphql-main'));
     logger.info(`Server started on port :${graphqlPort}`);
     SubscriptionServer.create(
       {
-        onConnect: connectionParams =>
-          logger.info('Client subscription connected!', connectionParams),
+        onConnect: connectionParams => logger.info('Client subscription connected!', connectionParams),
         onDisconnect: () => logger.info('Client subscription disconnected!'),
         execute,
         subscribe,

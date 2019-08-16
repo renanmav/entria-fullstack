@@ -1,5 +1,7 @@
 const { resolve } = require('path');
 
+require('dotenv').config();
+
 module.exports = {
   entry: {
     index: ['./src/index.js'],

@@ -13,8 +13,8 @@ if (process.env.NOW_REGION) {
 const ENV = process.env;
 
 // Database Settings
-const dBdevelopment = ENV.MONGO_URL || 'mongodb://localhost/database';
-const dBproduction = ENV.MONGO_URL || 'mongodb://localhost/database';
+const dBdevelopment = ENV.MONGO_URL || 'mongodb://localhost:27017/graphql';
+const dBproduction = ENV.MONGO_URL || 'mongodb://admin:entria12345678@ds163757.mlab.com:63757/twitter-relay';
 
 // Test Database Settings
 // const test = 'mongodb://localhost/awesome-test';
