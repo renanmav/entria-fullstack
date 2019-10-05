@@ -1,16 +1,13 @@
 FROM node:8
 
-MAINTAINER Entria <hello@entria.com.br>
-
 RUN mkdir -p /app
 WORKDIR /app
 
 COPY package.json /app
-RUN npm i
+RUN yarn
 
 COPY . /app
 
-#cachable
-RUN npm run build
+ENV NODE_ENV=development
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
